@@ -1,6 +1,6 @@
 import axios from "axios";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Product } from "./types/Product";
 import ProductCard from "./components/ProductCard";
 import SearchInput from "./components/SearchInput";
@@ -43,31 +43,29 @@ export default function App() {
     getProducts();
   }, []);
 
-  let filteredProducts = products
-    .filter((product) =>
-      product.title.toLowerCase().includes(search.toLowerCase()),
-    )
-    .filter((product) =>
-      selectedCategory === "" ? true : product.category === selectedCategory,
-    );
+  const filteredProducts = useMemo(() => {
+    let result = products
+      .filter((product) =>
+        product.title.toLowerCase().includes(search.toLowerCase()),
+      )
+      .filter((product) =>
+        selectedCategory === "" ? true : product.category === selectedCategory,
+      );
 
-  switch (sortBy) {
-    case "low-high":
-      filteredProducts = [...filteredProducts].sort(
-        (a, b) => a.price - b.price,
-      );
-      break;
-    case "high-low":
-      filteredProducts = [...filteredProducts].sort(
-        (a, b) => b.price - a.price,
-      );
-      break;
-    case "rating":
-      filteredProducts = [...filteredProducts].sort(
-        (a, b) => b.rating.rate - a.rating.rate,
-      );
-      break;
-  }
+    switch (sortBy) {
+      case "low-high":
+        result = [...result].sort((a, b) => a.price - b.price);
+        break;
+      case "high-low":
+        result = [...result].sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        result = [...result].sort((a, b) => b.rating.rate - a.rating.rate);
+        break;
+    }
+
+    return result;
+  }, [products, search, selectedCategory, sortBy]);
 
   return (
     <div className="min-h-dvh bg-slate-50">
