@@ -93,14 +93,17 @@ export default function App() {
         </div>
       </div>
 
-      {filteredProducts.length > 0 && (
+
+      {
+      filteredProducts.length > 0 && (
         <div className="container">
           <p className="py-3 text-xs text-slate-400">
-            Showing {filteredProducts.length} result
+            Showing {filteredProducts.length} product
             {filteredProducts.length !== 1 ? "s" : ""}
           </p>
         </div>
-      )}
+      )
+      }
 
       {isLoading ? (
         <LoadingSpinner />
