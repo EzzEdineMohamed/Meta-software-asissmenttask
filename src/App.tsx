@@ -26,6 +26,9 @@ export default function App() {
     "women's clothing",
   ];
 
+  {
+    /* fetching products using axios with [try - catch - finally] operators and handle loading and erorr states  */
+  }
   async function getProducts() {
     try {
       setIsLoading(true);
@@ -39,10 +42,16 @@ export default function App() {
     }
   }
 
+  {
+    /* calling fetching function in mounting phase */
+  }
   useEffect(() => {
     getProducts();
   }, []);
 
+  {
+    /* using useMemo hook for memoization */
+  }
   const filteredProducts = useMemo(() => {
     let result = products
       .filter((product) =>
@@ -52,6 +61,9 @@ export default function App() {
         selectedCategory === "" ? true : product.category === selectedCategory,
       );
 
+    {
+      /* take the result of search or category sellction and make sorting on it using sorting state by switch case instead of if condition chaining */
+    }
     switch (sortBy) {
       case "low-high":
         result = [...result].sort((a, b) => a.price - b.price);
@@ -63,7 +75,10 @@ export default function App() {
         result = [...result].sort((a, b) => b.rating.rate - a.rating.rate);
         break;
     }
-
+    
+    {
+      /* after that return result to appear it */
+    }
     return result;
   }, [products, search, selectedCategory, sortBy]);
 
@@ -93,21 +108,21 @@ export default function App() {
         </div>
       </div>
 
-
-      {
-      filteredProducts.length > 0 && (
+      {/* conditional rendering for appear number of product/s */}
+      {filteredProducts.length > 0 && (
         <div className="container">
           <p className="py-3 text-xs text-slate-400">
             Showing {filteredProducts.length} product
             {filteredProducts.length !== 1 ? "s" : ""}
           </p>
         </div>
-      )
-      }
+      )}
 
+      {/* handle loading state */}
       {isLoading ? (
         <LoadingSpinner />
       ) : error ? (
+        // if we have error appear it with button to refrech page again
         <div className="flex h-64 items-center justify-center gap-2 text-red-500">
           <span className="text-lg">{error}</span>
           <button
@@ -117,9 +132,11 @@ export default function App() {
             Try again
           </button>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : // if we have not product with this keyword appear not found layer
+      filteredProducts.length === 0 ? (
         <NotFoundSlide />
       ) : (
+        //fetch product and pass array of the products and the keys of all products in props
         <div className="container grid gap-5 px-4 pb-10 md:px-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
