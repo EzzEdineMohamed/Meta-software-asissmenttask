@@ -105,8 +105,4 @@ src/
 
 [View Live Demo](https://meta-software-asissmenttask.vercel.app/)
 
----
 
-## 📄 License
-
-MIT
