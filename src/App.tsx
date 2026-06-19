@@ -4,13 +4,27 @@ import { useEffect, useState } from "react";
 import type { Product } from "./types/Product";
 import ProductCard from "./components/ProductCard";
 import SearchInput from "./components/SearchInput";
+import NotFoundSlide from "./components/NotFoundSlide";
+import SortSelect from "./components/SortSelect";
 import LoadingSpinner from "./components/LoadingState";
+import CategorySelector from "./components/CategorySelector";
+import Navbar from "./components/Navbar";
 
 export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const productCategories = [
+    "",
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing",
+  ];
 
   async function getProducts() {
     try {
@@ -29,29 +43,66 @@ export default function App() {
     getProducts();
   }, []);
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(search.toLowerCase()),
-  );
+  let filteredProducts = products
+    .filter((product) =>
+      product.title.toLowerCase().includes(search.toLowerCase()),
+    )
+    .filter((product) =>
+      selectedCategory === "" ? true : product.category === selectedCategory,
+    );
+
+  switch (sortBy) {
+    case "low-high":
+      filteredProducts = [...filteredProducts].sort(
+        (a, b) => a.price - b.price,
+      );
+      break;
+    case "high-low":
+      filteredProducts = [...filteredProducts].sort(
+        (a, b) => b.price - a.price,
+      );
+      break;
+    case "rating":
+      filteredProducts = [...filteredProducts].sort(
+        (a, b) => b.rating.rate - a.rating.rate,
+      );
+      break;
+  }
 
   return (
     <div className="min-h-dvh bg-slate-50">
-      <nav className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200/70 bg-white/80 px-6 py-4 backdrop-blur-sm">
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-indigo-600" />
-          <span className="text-base font-medium text-slate-800">
-            Meta Store
-          </span>
-        </div>
-        <span className="text-sm text-slate-400">
-          {isLoading ? "Loading..." : `${filteredProducts.length} products`}
-        </span>
-      </nav>
+      <Navbar isLoading={isLoading} filteredProducts={filteredProducts} />
 
       <div className="border-b border-slate-200/70 bg-white px-4 py-4 md:px-6">
-        <div className="container">
-          <SearchInput setSearch={setSearch} />
+        <div className="container flex flex-col gap-3">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <div className="w-full md:flex-1">
+              <SearchInput setSearch={setSearch} />
+            </div>
+            <SortSelect setSortBy={setSortBy} />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {productCategories.map((cat) => (
+              <CategorySelector
+                key={cat}
+                cat={cat}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+            ))}
+          </div>
         </div>
       </div>
+
+      {filteredProducts.length > 0 && (
+        <div className="container">
+          <p className="py-3 text-xs text-slate-400">
+            Showing {filteredProducts.length} result
+            {filteredProducts.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+      )}
 
       {isLoading ? (
         <LoadingSpinner />
@@ -66,11 +117,9 @@ export default function App() {
           </button>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="flex h-64 items-center justify-center text-slate-400">
-          No results found
-        </div>
+        <NotFoundSlide />
       ) : (
-        <div className="container grid gap-5 px-4 pb-10 pt-4 md:px-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="container grid gap-5 px-4 pb-10 md:px-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
