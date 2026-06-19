@@ -34,7 +34,7 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
 | Tool | Purpose |
 |------|---------|
-| **React 18** | UI framework |
+| **React 19** | UI framework |
 | **TypeScript** | Type safety |
 | **Tailwind CSS** | Styling & responsiveness |
 | **Axios** | HTTP requests / data fetching |
